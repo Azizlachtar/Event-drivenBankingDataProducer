@@ -1,0 +1,485 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class Account {
+  - permitted_denominations: List<String>
+  - opening_timestamp: String
+  - status: String
+  - instance_param_vals: InstanceParamVals
+  - stakeholder_ids: List<String>
+  - name: String
+  - id: String
+  + getOpening_timestamp(): String
+  + hashCode(): int
+  + getStatus(): String
+  + getName(): String
+  + setName(String): void
+  + builder(): AccountBuilder
+  + setId(String): void
+  + getId(): String
+  + setOpening_timestamp(String): void
+  + setStakeholder_ids(List<String>): void
+  + getInstance_param_vals(): InstanceParamVals
+  + getPermitted_denominations(): List<String>
+  + getStakeholder_ids(): List<String>
+  # canEqual(Object): boolean
+  + setInstance_param_vals(InstanceParamVals): void
+  + setStatus(String): void
+  + equals(Object): boolean
+  + toString(): String
+  + setPermitted_denominations(List<String>): void
+}
+class AccountBalanceEvent {
+  - event_id: String
+  - timestamp: String
+  - balance: Balance
+  + getBalance(): Balance
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + getTimestamp(): String
+  + getEvent_id(): String
+  - $default$event_id(): String
+  + setTimestamp(String): void
+  + setEvent_id(String): void
+  + builder(): AccountBalanceEventBuilder
+  - $default$timestamp(): String
+  + setBalance(Balance): void
+  + hashCode(): int
+  + toString(): String
+}
+class AccountCreatedEvent {
+  - account: Account
+  + setAccount(Account): void
+  + hashCode(): int
+  + getAccount(): Account
+  + equals(Object): boolean
+  + builder(): AccountCreatedEventBuilder
+  + toString(): String
+  # canEqual(Object): boolean
+}
+class AccountEvent<T> {
+  - account_update_updated: T
+  - account_created: T
+  - event_id: String
+  - timestamp: String
+  + getAccount_update_updated(): T
+  + setTimestamp(String): void
+  # canEqual(Object): boolean
+  - $default$event_id(): String
+  + getEvent_id(): String
+  + setEvent_id(String): void
+  + equals(Object): boolean
+  + toString(): String
+  + getTimestamp(): String
+  - $default$timestamp(): String
+  + setAccount_created(T): void
+  + hashCode(): int
+  + setAccount_update_updated(T): void
+  + getAccount_created(): T
+  + builder(): AccountEventBuilder<T>
+}
+class AccountProducerController {
+  - accountProducerService: AccountProducerService
+  + updateAccount(AccountUpdatedEvent): ResponseEntity<String>
+  + createAccount(AccountCreatedEvent): ResponseEntity<String>
+}
+class AccountProducerService {
+  - updateAccountTopic: NewTopic
+  - kafkaTemplate: KafkaTemplate<String, EventCustomer>
+  - createAccountTopic: NewTopic
+  - LOGGER: Logger
+  + sendCreateAccountEvent2(AccountEvent<AccountCreatedEvent>): void
+  + sendUpdateAccountEvent2(AccountEvent<AccountUpdatedEvent>): void
+}
+class AccountUpdatedEvent {
+  - account_update: accountUpdate
+  # canEqual(Object): boolean
+  + getAccount_update(): accountUpdate
+  + builder(): AccountUpdatedEventBuilder
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+  + setAccount_update(accountUpdate): void
+}
+class Balance {
+  - id: String
+  - account_id: String
+  - amount: BigDecimal
+  - asset: String
+  - denomination: String
+  + builder(): BalanceBuilder
+  + getAmount(): BigDecimal
+  + getAsset(): String
+  + setAccount_id(String): void
+  + setAmount(BigDecimal): void
+  + getDenomination(): String
+  + getAccount_id(): String
+  + setDenomination(String): void
+  # canEqual(Object): boolean
+  + toString(): String
+  + getId(): String
+  + hashCode(): int
+  + setAsset(String): void
+  + equals(Object): boolean
+  + setId(String): void
+}
+class BalanceProducerController {
+  - balanceProducerService: BalanceProducerService
+  + createBalance(Balance): ResponseEntity<String>
+}
+class BalanceProducerService {
+  - LOGGER: Logger
+  - kafkaTemplate: KafkaTemplate<String, EventCustomer>
+  - createBalanceTopic: NewTopic
+  + sendCreateBalanceEvent(AccountBalanceEvent): void
+}
+class CommittedPosting {
+  - asset: String
+  - phase: String
+  - account_address: String
+  - denomination: String
+  - account_id: String
+  - amount: String
+  - credit: String
+  + setAccount_id(String): void
+  + setDenomination(String): void
+  + getAsset(): String
+  + toString(): String
+  + setPhase(String): void
+  + getAccount_id(): String
+  # canEqual(Object): boolean
+  + getPhase(): String
+  + builder(): CommittedPostingBuilder
+  + getAccount_address(): String
+  + hashCode(): int
+  + setCredit(String): void
+  + setAmount(String): void
+  + setAsset(String): void
+  + getAmount(): String
+  + setAccount_address(String): void
+  + getDenomination(): String
+  + equals(Object): boolean
+  + getCredit(): String
+}
+class ConsumerProducerController {
+  - customerProducerService: CustomerProducerService
+  + createCustomer(CustomerDetails): ResponseEntity<String>
+  + updateCustomer(String, CustomerDetails): ResponseEntity<String>
+}
+class Customer {
+  - id: String
+  - status: String
+  - customer_details: CustomerDetails
+  + setId(String): void
+  # canEqual(Object): boolean
+  + builder(): CustomerBuilder
+  + hashCode(): int
+  + getStatus(): String
+  + equals(Object): boolean
+  + getCustomer_details(): CustomerDetails
+  + getId(): String
+  + setStatus(String): void
+  + setCustomer_details(CustomerDetails): void
+  + toString(): String
+}
+class CustomerDetails {
+  - email_address: String
+  - gender: String
+  - first_name: String
+  - last_name: String
+  - nationality: String
+  - title: String
+  + getTitle(): String
+  + toString(): String
+  + getLast_name(): String
+  + setNationality(String): void
+  # canEqual(Object): boolean
+  + getEmail_address(): String
+  + getNationality(): String
+  + setTitle(String): void
+  + setLast_name(String): void
+  + hashCode(): int
+  + setFirst_name(String): void
+  + setGender(String): void
+  + getGender(): String
+  + builder(): CustomerDetailsBuilder
+  + equals(Object): boolean
+  + setEmail_address(String): void
+  + getFirst_name(): String
+}
+class CustomerProducerService {
+  - updateCustomerTopic: NewTopic
+  - kafkaTemplate: KafkaTemplate<String, EventCustomer>
+  - LOGGER: Logger
+  - createCustomerTopic: NewTopic
+  + sendUpdateCustomerEvent(EventCustomer): void
+  + sendCreateCustomerEvent(EventCustomer): void
+}
+class EventAccountCreate {
+  - event_id: String
+  - timestamp: String
+  - account_created: AccountCreatedEvent
+  + getEvent_id(): String
+  + setTimestamp(String): void
+  + toString(): String
+  # canEqual(Object): boolean
+  - $default$timestamp(): String
+  + hashCode(): int
+  + getAccount_created(): AccountCreatedEvent
+  + builder(): EventAccountCreateBuilder
+  + setAccount_created(AccountCreatedEvent): void
+  - $default$event_id(): String
+  + equals(Object): boolean
+  + setEvent_id(String): void
+  + getTimestamp(): String
+}
+class EventAccountUpdate {
+  - timestamp: String
+  - event_id: String
+  - account_update_updated: AccountUpdatedEvent
+  - $default$event_id(): String
+  + setTimestamp(String): void
+  + getTimestamp(): String
+  + getEvent_id(): String
+  + toString(): String
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + builder(): EventAccountUpdateBuilder
+  - $default$timestamp(): String
+  + equals(Object): boolean
+  + setAccount_update_updated(AccountUpdatedEvent): void
+  + setEvent_id(String): void
+  + getAccount_update_updated(): AccountUpdatedEvent
+}
+class EventCustomer {
+  - eventId: String
+  - customer: Customer
+  - technical_metadata: String
+  + setCustomer(Customer): void
+  + getCustomer(): Customer
+  + builder(): EventCustomerBuilder
+  + setTechnical_metadata(String): void
+  + hashCode(): int
+  + toString(): String
+  + setEventId(String): void
+  + equals(Object): boolean
+  + getTechnical_metadata(): String
+  + getEventId(): String
+  # canEqual(Object): boolean
+}
+class EventPostingInstruction {
+  - technical_metadata: String
+  - posting_instruction_batch: PostingInstructionBatch
+  - eventId: String
+  + toString(): String
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + setEventId(String): void
+  + getPosting_instruction_batch(): PostingInstructionBatch
+  + hashCode(): int
+  + setPosting_instruction_batch(PostingInstructionBatch): void
+  + getEventId(): String
+  + setTechnical_metadata(String): void
+  - $default$eventId(): String
+  - $default$technical_metadata(): String
+  + builder(): EventPostingInstructionBuilder
+  + getTechnical_metadata(): String
+}
+class InstanceParamVals {
+  - interest_application_day: String
+  - arranged_overdraft_limit: String
+  - autosave_savings_account: String
+  - unarranged_overdraft_limit: String
+  - daily_atm_withdrawal_limit: String
+  + getArranged_overdraft_limit(): String
+  + setAutosave_savings_account(String): void
+  + setInterest_application_day(String): void
+  + getUnarranged_overdraft_limit(): String
+  + equals(Object): boolean
+  + getAutosave_savings_account(): String
+  # canEqual(Object): boolean
+  + setDaily_atm_withdrawal_limit(String): void
+  + builder(): InstanceParamValsBuilder
+  + setUnarranged_overdraft_limit(String): void
+  + hashCode(): int
+  + toString(): String
+  + setArranged_overdraft_limit(String): void
+  + getDaily_atm_withdrawal_limit(): String
+  + getInterest_application_day(): String
+}
+class InstanceParamValsUpdate {
+  - instance_param_vals: InstanceParamVals
+  + getInstance_param_vals(): InstanceParamVals
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + toString(): String
+  + hashCode(): int
+  + setInstance_param_vals(InstanceParamVals): void
+  + builder(): InstanceParamValsUpdateBuilder
+}
+class KafkaProducerConfig {
+  - bootstrapServers: String
+  + producerFactory(): ProducerFactory<String, EventCustomer>
+  + kafkaTemplate(): KafkaTemplate<String, EventCustomer>
+}
+class KafkaTopicConfig {
+  - bootstrapAddress: String
+  + createCustomerTopic(String, int, short): NewTopic
+  + createAccountTopic(String, int, short): NewTopic
+  + createTransactionTopic(String, int, short): NewTopic
+  + createPostingInstructionBatchTopic(String, int, short): NewTopic
+  + updateCustomerTopic(String, int, short): NewTopic
+  + updateAccountTopic(String, int, short): NewTopic
+  + createBalanceTopic(String, int, short): NewTopic
+  + kafkaAdmin(): KafkaAdmin
+}
+class PostingInstruction {
+  - id: String
+  - client_transaction_id: String
+  - committed_postings: List<CommittedPosting>
+  + setCommitted_postings(List<CommittedPosting>): void
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + getId(): String
+  + getCommitted_postings(): List<CommittedPosting>
+  + setClient_transaction_id(String): void
+  + setId(String): void
+  + getClient_transaction_id(): String
+  + hashCode(): int
+  + toString(): String
+  + builder(): PostingInstructionBuilder
+}
+class PostingInstructionBatch {
+  - client_id: String
+  - status: String
+  - id: String
+  - posting_instructions: List<PostingInstruction>
+  + getClient_id(): String
+  + setClient_id(String): void
+  + getId(): String
+  # canEqual(Object): boolean
+  + toString(): String
+  + getStatus(): String
+  + equals(Object): boolean
+  + hashCode(): int
+  + setStatus(String): void
+  + builder(): PostingInstructionBatchBuilder
+  + setPosting_instructions(List<PostingInstruction>): void
+  + getPosting_instructions(): List<PostingInstruction>
+  + setId(String): void
+}
+class PostingInstructionBatchProducerService {
+  - LOGGER: Logger
+  - kafkaTemplate: KafkaTemplate<String, EventCustomer>
+  - createPostingInstructionBatchTopic: NewTopic
+  + sendCreatePostingInstructionBatchEvent(EventPostingInstruction): void
+}
+class PostingInstructionsBatchProducerController {
+  - postingInstructionBatchProducerService: PostingInstructionBatchProducerService
+  + createPostingInstruction(PostingInstructionBatch): ResponseEntity<String>
+}
+class ThoughtMachineProducerKafkaApplication {
+  + main(String[]): void
+}
+class ThoughtMachineProducerKafkaApplicationTests {
+  ~ contextLoads(): void
+}
+class Transaction {
+  + status: String
+  - balance_id: String
+  - toAccount: String
+  - fromAccount: String
+  + timestamp: String
+  - amount: BigDecimal
+  - id: String
+  + getStatus(): String
+  + toString(): String
+  + builder(): TransactionBuilder
+  + getBalance_id(): String
+  + getAmount(): BigDecimal
+  + setToAccount(String): void
+  + setId(String): void
+  + setTimestamp(String): void
+  + hashCode(): int
+  + getTimestamp(): String
+  + setAmount(BigDecimal): void
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + getFromAccount(): String
+  + setBalance_id(String): void
+  + getId(): String
+  + setFromAccount(String): void
+  + setStatus(String): void
+  + getToAccount(): String
+}
+class TransactionEvent {
+  - event_id: String
+  - timestamp: String
+  - transaction: Transaction
+  + getEvent_id(): String
+  + getTimestamp(): String
+  + setEvent_id(String): void
+  + builder(): TransactionEventBuilder
+  + hashCode(): int
+  + setTransaction(Transaction): void
+  - $default$timestamp(): String
+  + toString(): String
+  + setTimestamp(String): void
+  + equals(Object): boolean
+  - $default$event_id(): String
+  + getTransaction(): Transaction
+  # canEqual(Object): boolean
+}
+class TransactionProducerService {
+  - createTransactionTopic: NewTopic
+  - LOGGER: Logger
+  - kafkaTemplate: KafkaTemplate<String, EventCustomer>
+  + sendCreateTransactionEvent(TransactionEvent): void
+}
+class TransactionsProducerController {
+  - transactionProducerService: TransactionProducerService
+  + createTransaction(Transaction): ResponseEntity<String>
+}
+class accountUpdate {
+  - instance_param_vals_update: InstanceParamValsUpdate
+  - status: String
+  - create_timestamp: String
+  - account_id: String
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + getAccount_id(): String
+  + setCreate_timestamp(String): void
+  + getCreate_timestamp(): String
+  + builder(): accountUpdateBuilder
+  + getInstance_param_vals_update(): InstanceParamValsUpdate
+  + toString(): String
+  + setStatus(String): void
+  + getStatus(): String
+  + setAccount_id(String): void
+  + equals(Object): boolean
+  + setInstance_param_vals_update(InstanceParamValsUpdate): void
+}
+
+Account                                     "1" *-[#595959,plain]-> "instance_param_vals\n1" InstanceParamVals                           
+AccountBalanceEvent                         "1" *-[#595959,plain]-> "balance\n1" Balance                                     
+AccountCreatedEvent                         "1" *-[#595959,plain]-> "account\n1" Account                                     
+AccountProducerController                   "1" *-[#595959,plain]-> "accountProducerService\n1" AccountProducerService                      
+AccountUpdatedEvent                         "1" *-[#595959,plain]-> "account_update\n1" accountUpdate                               
+BalanceProducerController                   "1" *-[#595959,plain]-> "balanceProducerService\n1" BalanceProducerService                      
+ConsumerProducerController                  "1" *-[#595959,plain]-> "customerProducerService\n1" CustomerProducerService                     
+Customer                                    "1" *-[#595959,plain]-> "customer_details\n1" CustomerDetails                             
+EventAccountCreate                          "1" *-[#595959,plain]-> "account_created\n1" AccountCreatedEvent                         
+EventAccountUpdate                          "1" *-[#595959,plain]-> "account_update_updated\n1" AccountUpdatedEvent                         
+EventCustomer                               "1" *-[#595959,plain]-> "customer\n1" Customer                                    
+EventPostingInstruction                     "1" *-[#595959,plain]-> "posting_instruction_batch\n1" PostingInstructionBatch                     
+InstanceParamValsUpdate                     "1" *-[#595959,plain]-> "instance_param_vals\n1" InstanceParamVals                           
+PostingInstruction                          "1" *-[#595959,plain]-> "committed_postings\n*" CommittedPosting                            
+PostingInstructionBatch                     "1" *-[#595959,plain]-> "posting_instructions\n*" PostingInstruction                          
+PostingInstructionsBatchProducerController  "1" *-[#595959,plain]-> "postingInstructionBatchProducerService\n1" PostingInstructionBatchProducerService      
+TransactionEvent                            "1" *-[#595959,plain]-> "transaction\n1" Transaction                                 
+TransactionsProducerController              "1" *-[#595959,plain]-> "transactionProducerService\n1" TransactionProducerService                  
+accountUpdate                               "1" *-[#595959,plain]-> "instance_param_vals_update\n1" InstanceParamValsUpdate                     
+@enduml
